@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+notify-send "Shutting down..." && mpv ~/.config/hypr/scripts/resources/shutdown.opus
+systemctl poweroff

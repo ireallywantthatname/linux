@@ -1,0 +1,11 @@
+#!/bin/bash
+
+PREV_BAT_STATUS=""
+while true; do
+  BAT_STATUS=$(cat /sys/class/power_supply/BAT0/status)
+  if [[ "$BAT_STATUS" != "$PREV_BAT_STATUS" ]]; then
+    notify-send --urgency=CRITICAL "Battery : ${BAT_STATUS}"
+    PREV_BAT_STATUS="$BAT_STATUS"
+  fi
+  sleep 1
+done

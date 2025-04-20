@@ -1,0 +1,11 @@
+#!/bin/bash
+
+while true; do
+  BAT_LVL=$(cat /sys/class/power_supply/BAT0/capacity)
+  if [ "$BAT_LVL" -le 20 ]; then
+    notify-send --urgency=CRITICAL "Battery : ${BAT_LVL}%"
+    sleep 300
+  else
+    sleep 120
+  fi
+done
