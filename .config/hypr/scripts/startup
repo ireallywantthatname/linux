@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+notify-send "Setting up..." && nice -20 mpv ~/.config/hypr/scripts/resources/startup.opus
+

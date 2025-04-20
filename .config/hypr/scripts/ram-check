@@ -1,0 +1,7 @@
+#!/bin/bash
+
+RAM_USAGE=$(free | awk '/Mem/{printf("%.0f%%"), $3/$2 * 100}')
+
+if [ "${RAM_USAGE%.*}" -ge 85 ]; then
+    notify-send "Memory Warning" "RAM usage is at $RAM_USAGE"
+fi

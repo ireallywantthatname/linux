@@ -1,0 +1,32 @@
+use_nerdfont = true
+flip_status_indicators = true
+backend = "pulseaudio"
+volnorm = true
+notify = true
+bitrate = 320
+hide_display_names = true
+cover_max_scale = 2
+library_tabs = ["tracks", "playlists"]
+statusbar_format = "%artists - %title"
+[track_format]
+left = "%title - %artists"
+center = ""
+right = ""
+[theme]
+background = "#000000"
+primary = "#F8F8F2"
+secondary = "#000000"
+title = "#bd93f9"
+playing = "#bd93f9"
+playing_selected = "#D0B3FA"
+playing_bg = "#000000"
+highlight = "#f8f8f2"
+highlight_bg = "#21222c"
+error = "#f8f8f2"
+error_bg = "#ff5555"
+statusbar = "#000000"
+statusbar_progress = "#bd93f9"
+statusbar_bg = "#bd93f9"
+cmdline = "#f8f8f2"
+cmdline_bg = "#000000"
+search_match = "#ff79c6"

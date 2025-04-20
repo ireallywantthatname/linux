@@ -1,0 +1,26 @@
+#!/bin/bash
+
+SESSION_NAME="void"
+
+# Check if the session exists and attach if it does
+if tmux has-session -t $SESSION_NAME 2>/dev/null; then
+  echo "Session $SESSION_NAME already exists. Attaching to it."
+  tmux attach-session -t $SESSION_NAME
+else
+  # Create a new session and split windows
+  tmux new-session -d -s $SESSION_NAME
+  tmux split-window -h
+  tmux split-window -v -t 1
+
+  # Optionally adjust pane sizes
+  tmux select-pane -t 1
+  tmux resize-pane -D 10
+  tmux select-pane -t 0 # Changed to '0' for clarity
+  tmux resize-pane -L 5
+
+  # Start the application in the selected pane
+  tmux send-keys -t 1 'btop' C-m
+  
+  # Finally, attach to the session
+  tmux attach-session -t $SESSION_NAME
+fi

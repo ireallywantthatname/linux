@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+if pgrep -x "steam" > /dev/null; then
+    notify-send "Shutting down steam... " && steam-native -shutdown
+else
+    notify-send "Lanching steam..." && steam-native -tenfoot
+fi

@@ -1,0 +1,40 @@
+* {
+  font-family: FiraCode Nerd Font;
+  font-size: 12pt;
+}
+
+window {
+        background-color: rgba (30, 30, 46, 1.00)
+}
+
+/* Outer bar container, takes all the window width/height */
+#outer-box {
+	margin: 0px
+}
+
+/* Inner bar container, surrounds buttons */
+#inner-box {
+	background-color: rgba (30, 30, 46, 1.00);
+	border-radius: 0px;
+	border-style: none;
+	border-width: 0px;
+	border-color: rgba (30, 30, 46, 1.00);
+	padding: 5px;
+	margin: 5px
+}
+
+button, image {
+	background: none;
+	border: none;
+	box-shadow: none
+}
+
+button {
+	padding-left: 10px;
+	padding-right: 10px;
+	margin: 5px
+}
+
+button:hover {
+	background-color: rgba (255, 255, 255, 0.1)
+}
