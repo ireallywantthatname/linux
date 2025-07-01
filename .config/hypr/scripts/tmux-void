@@ -1,0 +1,32 @@
+#!/bin/bash
+
+SESSION_NAME="void"
+
+if tmux has-session -t $SESSION_NAME 2>/dev/null; then
+  echo "Session $SESSION_NAME already exists. Attaching to it."
+  tmux attach-session -t $SESSION_NAME
+else
+  tmux new-session -d -s $SESSION_NAME
+
+  tmux split-window -h
+
+  tmux split-window -v -t 1
+
+  tmux split-window -v -t 3
+
+  tmux select-pane -t 1
+
+  tmux resize-pane -D 10
+
+  tmux select-pane -t 4
+
+  tmux resize-pane -L 5
+
+  tmux resize-pane -U 5
+
+  tmux send-keys -t 1 'btop' C-m
+
+  # tmux send-keys -t 4 'fastfetch' C-m
+
+  tmux attach-session -t $SESSION_NAME
+fi
