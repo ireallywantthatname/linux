@@ -21,7 +21,7 @@ configuration {
 
     foreground: @drac-fgd;
     background-color: @drac-bgd;
-    active-background: @drac-pnk;
+    active-background: @drac-pur;
     urgent-background: @drac-red;
     urgent-foreground: @drac-bgd;
     

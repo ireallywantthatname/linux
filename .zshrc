@@ -1,6 +1,4 @@
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-fi
+ZSH_THEME="avit"
 
 export ZSH="$HOME/.oh-my-zsh"
 
@@ -67,8 +65,8 @@ export QT_IM_MODULE=ibus
 
 export TERM=xterm
 
-source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
-
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 source /usr/share/fzf/key-bindings.zsh
+
+
