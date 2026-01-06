@@ -2,6 +2,17 @@ position = "top"
 height = 24
 
 [[start]]
+type = "menu"
+height = 400
+width = 200
+icon = "archlinux"
+
+[[start.start]]
+type = "custom"
+label = "Terminal"
+on_click = "xterm"
+
+[[start]]
 type = "workspaces"
 
 [[center]]
@@ -26,4 +37,21 @@ cpu = 1
 type = "tray"
 
 [[end]]
+type = "battery"
+format = "{percentage}%"
+
+[end.thresholds]
+warning = 20
+critical = 5
+
+[[end]]
+type = "clipboard"
+max_items = 3
+
+[end.truncate]
+mode = "end"
+length = 50
+
+[[end]]
 type = "clock"
+
