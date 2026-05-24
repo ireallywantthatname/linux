@@ -34,6 +34,10 @@ hl.on("hyprland.start", function ()
     hl.exec_cmd("bash ~/.config/hypr/scripts/battery-status")
     hl.exec_cmd("hyprlauncher -d")
     hl.exec_cmd("hyprsunset")
+
+    -- Bluetooth
+    hl.exec_cmd("blueman-applet")
+    hl.exec_cmd("bash ~/.config/hypr/scripts/bluetooth-battery")
     
     -- hl.exec_cmd("hypridle")
 end)

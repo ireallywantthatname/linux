@@ -37,7 +37,7 @@ hl.window_rule({
 -- -- hl.window_rule({ match = { class = "org.nomacs.ImageLounge" }, float = true })
 -- -- hl.window_rule({ match = { class = "org.nomacs.ImageLounge" }, size = { 1000, 800 } })
 -- 
--- -- hl.window_rule({ match = { class = "blueman-manager" }, float = true })
+hl.window_rule({ match = { class = "blueman-manager" }, float = true })
 
 
 -------------------------

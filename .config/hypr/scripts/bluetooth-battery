@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+# Bluetooth device battery monitor
+# Checks battery levels of connected BT devices every 5 minutes
+# Sends notifications when battery is low (<= 20%) or critical (<= 10%)
+
+CHECK_INTERVAL=300  # 5 minutes
+LOW_THRESHOLD=20
+CRITICAL_THRESHOLD=10
+
+# Track which devices we've already warned about to avoid spam
+declare -A warned_devices
+
+get_battery() {
+    local mac="$1"
+    
+    # Try bluetoothctl
+    local battery
+    battery=$(bluetoothctl info "$mac" 2>/dev/null | grep "Battery Percentage" | grep -oP '0x[0-9a-fA-F]+' | head -1)
+    if [[ -n "$battery" ]]; then
+        printf "%d" "$battery"
+        return
+    fi
+    
+    # Fallback to UPower
+    local upower_path
+    upower_path=$(upower -e 2>/dev/null | grep "${mac//:/_}" | head -1)
+    if [[ -n "$upower_path" ]]; then
+        upower -i "$upower_path" 2>/dev/null | grep "percentage" | awk '{print $2}' | tr -d '%'
+        return
+    fi
+    
+    echo ""
+}
+
+check_all_devices() {
+    while IFS= read -r line; do
+        local mac name
+        mac=$(echo "$line" | awk '{print $2}')
+        name=$(echo "$line" | cut -d' ' -f3-)
+        
+        # Only check connected devices
+        if ! bluetoothctl info "$mac" 2>/dev/null | grep -q "Connected: yes"; then
+            # Device disconnected, reset warning state
+            unset "warned_devices[$mac]"
+            continue
+        fi
+        
+        local battery
+        battery=$(get_battery "$mac")
+        [[ -z "$battery" ]] && continue
+        
+        if (( battery <= CRITICAL_THRESHOLD )); then
+            if [[ "${warned_devices[$mac]}" != "critical" ]]; then
+                notify-send -u critical \
+                    -h string:x-canonical-private-synchronous:bt-battery-"$mac" \
+                    "🪫 $name — $battery%" \
+                    "Battery critically low. Charge soon!"
+                warned_devices["$mac"]="critical"
+            fi
+        elif (( battery <= LOW_THRESHOLD )); then
+            if [[ -z "${warned_devices[$mac]}" ]]; then
+                notify-send -u normal \
+                    -h string:x-canonical-private-synchronous:bt-battery-"$mac" \
+                    "🔋 $name — $battery%" \
+                    "Battery is getting low."
+                warned_devices["$mac"]="low"
+            fi
+        else
+            # Battery OK, reset warning state
+            unset "warned_devices[$mac]"
+        fi
+    done < <(bluetoothctl devices Paired 2>/dev/null)
+}
+
+# ─── Main Loop ───────────────────────────────────────────────────────────────
+
+# Run as daemon — exit cleanly on SIGTERM
+trap 'exit 0' SIGTERM SIGINT
+
+while true; do
+    # Only check if bluetooth is powered on
+    if bluetoothctl show 2>/dev/null | grep -q "Powered: yes"; then
+        check_all_devices
+    fi
+    sleep "$CHECK_INTERVAL"
+done

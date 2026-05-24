@@ -1,0 +1,105 @@
+#!/usr/bin/env bash
+
+set -u
+
+notify() {
+    if command -v notify-send >/dev/null 2>&1; then
+        notify-send -h string:x-canonical-private-synchronous:bluetooth-notify \
+            -u low -i bluetooth "$1"
+    fi
+}
+
+device_mac_from_line() {
+    printf "%s\n" "$1" | awk '{print $2}'
+}
+
+device_name_from_line() {
+    printf "%s\n" "$1" | cut -d' ' -f3-
+}
+
+is_connected() {
+    bluetoothctl info "$1" 2>/dev/null | grep -q "Connected: yes"
+}
+
+connect_device() {
+    local mac="$1"
+    local name="$2"
+    local output
+
+    output=$(bluetoothctl connect "$mac" 2>&1)
+    if grep -qi "Connection successful" <<<"$output"; then
+        notify "Connected to $name"
+    else
+        notify "Failed to connect to $name"
+        return 1
+    fi
+}
+
+disconnect_device() {
+    local mac="$1"
+    local name="$2"
+    local output
+
+    output=$(bluetoothctl disconnect "$mac" 2>&1)
+    if grep -Eqi "Successful disconnected|not connected|org.bluez.Error.NotConnected" <<<"$output"; then
+        notify "Disconnected from $name"
+    else
+        notify "Failed to disconnect from $name"
+        return 1
+    fi
+}
+
+main() {
+    local menu_items=""
+    local line mac name status row selection device_info selected_mac selected_status selected_name
+    declare -A device_map=()
+
+    if ! command -v bluetoothctl >/dev/null 2>&1; then
+        notify "bluetoothctl is not installed"
+        return 1
+    fi
+
+    if ! command -v fuzzel >/dev/null 2>&1; then
+        notify "fuzzel is not installed"
+        return 1
+    fi
+
+    while IFS= read -r line; do
+        [[ -z "$line" ]] && continue
+
+        mac=$(device_mac_from_line "$line")
+        name=$(device_name_from_line "$line")
+        [[ -z "$mac" || -z "$name" ]] && continue
+
+        if is_connected "$mac"; then
+            status="connected"
+        else
+            status="disconnected"
+        fi
+
+        row="$status $name"
+        menu_items+="$row"$'\n'
+        device_map["$row"]="$mac|$status|$name"
+    done < <(bluetoothctl devices Paired 2>/dev/null)
+
+    if [[ -z "$menu_items" ]]; then
+        notify "No paired Bluetooth devices"
+        return
+    fi
+
+    selection=$(printf "%s" "$menu_items" | fuzzel --dmenu)
+    [[ -z "$selection" ]] && return
+
+    device_info="${device_map[$selection]:-}"
+    [[ -z "$device_info" ]] && return 1
+
+    IFS='|' read -r selected_mac selected_status selected_name <<<"$device_info"
+
+    if [[ "$selected_status" == "connected" ]]; then
+        disconnect_device "$selected_mac" "$selected_name"
+    else
+        connect_device "$selected_mac" "$selected_name"
+    fi
+}
+
+main
