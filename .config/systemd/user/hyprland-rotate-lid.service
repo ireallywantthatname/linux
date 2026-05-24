@@ -1,0 +1,13 @@
+[Unit]
+Description=Hyprland Screen Rotation Daemon based on Lid Angle
+After=graphical-session.target
+
+[Service]
+Type=simple
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/home/irwtn/.local/bin/hyprland-rotate-lid.py
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=default.target
