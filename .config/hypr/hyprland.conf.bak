@@ -1,7 +1,7 @@
-monitor = eDP-1, 2256x1504@59.99900, 0x0, 1.333333
-# monitor = eDP-1, 2256x1504@59.99900, 0x0, 1.566667
-monitor = DP-1, 1920x1080@60.00000, 0x-1080, 1
-monitor = DP-2, 1920x1080@60.00000, 0x-1080, 1
+monitor = eDP-1, 2256x1504@60.00, 0x0, 1.566667
+monitor = DP-1, 1920x1080@60.00000, 0x-1080, 1.25
+# monitor = DP-2, 1920x1080@60.00000, 0x-1080, 1.25
+# monitor = HDMI-A-1, 1920x1080@60.00000, 0x0, 1.25
 
 xwayland {
   force_zero_scaling = true
@@ -9,25 +9,24 @@ xwayland {
 
 $terminal = kitty
 $fileManager = thunar
-$menu = tofi-drun | xargs hyprctl dispatch exec --
-$browser = thorium-browser
+# $menu = tofi-drun | xargs hyprctl dispatch exec --
+$menu = fuzzel
+$browser = helium-browser
 
-exec-once = dunst &
+exec-once = fnott &
 exec-once = nm-applet &
-exec-once = swaybg -i ~/Downloads/anya-taylor-joy-olga-of-the-birch-forest-the-northman-2022-4000x2297-7853.jpg -m fill &
-# exec-once = waybar &
+# exec-once = swaybg -i ~/Downloads/wallpaper.jpeg -m fit &
+exec-once = swaybg -i ~/Downloads/IMG_3175.jpg -m fit &
+exec-once = /home/irwtn/.local/bin/ironbar &
 exec-once = wl-paste --type text --watch cliphist store &
-exec-once = wl-paste --type image --watch cliphist stor &
+exec-once = wl-paste --type image --watch cliphist store &
 
-exec-once = ~/.config/hypr/scripts/startup
-
-exec-once = [workspace 9 silent] $browser
-exec-once = [workspace 10 silent] $terminal bash ~/.config/hypr/scripts/tmux-void
-exec-once = [workspace special:everything silent] $terminal -o background_opacity=0.8 bash ~/.config/hypr/scripts/tmux-everything
-exec-once = [workspace special:cava silent;] $terminal -o background_opacity=0 cava
-
+exec-once = bash ~/.config/hypr/scripts/startup
 exec-once = thunar --daemon
-exec-once = extramaus
+# exec-once = extramaus
+
+exec-once = bash ~/.config/hypr/scripts/battery-low
+exec-once = bash ~/.config/hypr/scripts/battery-status
 
 # exec-once = hypridle
 
@@ -35,30 +34,29 @@ env = XCURSOR_SIZE,24
 env = HYPRCURSOR_SIZE,24
 
 general { 
-  gaps_in = 5
-  gaps_out = 10
-  border_size = 2
+  gaps_in = 4
+  gaps_out = 8
+  border_size = 0
   col.inactive_border = 0xff000000
-  col.active_border = 0xffbd93f9
+  col.active_border = 0xffc0c0c0
   resize_on_border = false 
   allow_tearing = true
   layout = dwindle
 }
 
 decoration {
-    rounding = 20
-  }
-
-decoration {
+  rounding = 0
+  dim_inactive = true
+  dim_strength = 0.2
   dim_special = 0
   blur {
-    enabled = true
+    enabled = false
   }
 }
 
 animations {
-  enabled = true
-  first_launch_animation = false
+  enabled = false
+  # first_launch_animation = false
 
   bezier = overshot, 0.13, 0.99, 0.29, 1.1
   animation = windows, 1, 4, overshot, slide
@@ -69,7 +67,7 @@ animations {
 }
 
 dwindle {
-  pseudotile = true
+  # pseudotile = true
   preserve_split = true
 }
 
@@ -82,22 +80,28 @@ misc {
   font_family = FiraCode Nerd Font
   splash_font_family = FiraCode Nerd Font
   force_default_wallpaper = 1
+  vrr = 1
 }
 
 input {
   kb_layout = us
   follow_mouse = 1
-  sensitivity = 0.4
+  sensitivity = 0.3
   focus_on_close = 1
   touchpad {
     natural_scroll = true
     middle_button_emulation = true
   }
+  touchdevice {
+      enabled = true
+    }
 }
 
 gestures {
-  workspace_swipe = true
   workspace_swipe_touch = true
+  gesture = 3, horizontal, workspace
+  gesture = 3, up, fullscreen
+  gesture = 3, down, close
 }
 
 device {
@@ -115,40 +119,46 @@ cursor {
   zoom_factor = 1
 }
 
-###################
-### KEYBINDINGS ###
-###################
-
-# See https://wiki.hyprland.org/Configuring/Keywords/
 $mainMod = ALT
 
-# Example binds, see https://wiki.hyprland.org/Configuring/Binds/ for more
-bind = $mainMod, Q, killactive,
+bindel = $mainMod, Q, killactive,
 bind = SUPER SHIFT, Q, exit,
 bind = $mainMod, P, exec, $menu
 bind = $mainMod, R, pseudo,
 bind = $mainMod, V, togglefloating,
-bind = $mainMod, T, togglesplit,
+# bind = $mainMod, T, togglesplit,
 bind = $mainMod, M, fullscreen
+bind = SUPER, P, pin
 bind = SUPER SHIFT, L, exec, hyprlock
-bind = SUPER SHIFT, T, exec, hyprctl dispatch dpms toggle
 bind = SUPER SHIFT, R, exec, systemctl reboot
 bind = SUPER SHIFT, S, exec, systemctl suspend
 bind = SUPER SHIFT, P, exec, ~/.config/hypr/scripts/shutdown
 bind = , Print, exec, ~/.config/hypr/scripts/screenshots.sh
+# bind = , Print, exec, adb shell input keyevent 25 & adb shell input keyevent 26
 bind = SHIFT, Print, exec, ~/.config/hypr/scripts/ocr.sh
+bind = SUPER, V, exec, ~/.local/bin/voice-typer
 bind = , Pause, exec, playerctl --player=spotify play-pause
 bind = , XF86AudioPrev, exec, playerctl --player=spotify previous
 bind = , XF86AudioNext, exec, playerctl --player=spotify next
 
+bind = , XF86PowerOff, exec, hyprctl dispatch dpms toggle
+# bind = , XF86PowerOff, exec, adb shell input keyevent 26
+bind = SUPER, XF86PowerOff, exec, hyprctl keyword input:touchdevice:enabled true
+bind = SUPER SHIFT, XF86PowerOff, exec, hyprctl keyword input:touchdevice:enabled false
+bind = $mainMod, XF86PowerOff, exec, adb shell input keyevent 26
+# bind = , XF86PowerOff, exec, hyprctl keyword monitor eDP-1,preferred,auto,1.333333,transform,2
+# bind = SHIFT, XF86PowerOff, exec, hyprctl keyword monitor eDP-1,preferred,auto,1.333333,transform,0
+
 bindel = SUPER, G, swapnext
 bind = SUPER SHIFT, G, exec, ~/.config/hypr/scripts/steam
-bind = SUPER, M, exec, [workspace 5] $browser --app=https://web.whatsapp.com
+bind = SUPER, M, exec, [workspace 5] $browser --profile-directory="Default" --app=https://web.whatsapp.com
 
-bind = SUPER, V, exec, cliphist list | rofi -dmenu | cliphist decode | wl-copy
-bind = SUPER, RETURN, exec, $terminal
+bind = $mainMod, O, exec, cliphist list | fuzzel --dmenu  | cliphist decode | wl-copy
+bind = SUPER, O, exec, echo -e "spreadsheets\npresentation\nforms\ndocument" | fuzzel --dmenu | xargs -I{} $browser --profile-directory="Default" --app=https://docs.google.com/{}/ &> /dev/null &
+bind = SUPER, L, exec, ~/.config/hypr/scripts/work --list
+bind = $mainMod, RETURN, exec, $terminal
 bind = SUPER SHIFT, W, exec, brave
-bind = SUPER, W, exec, $browser
+bind = SUPER, W, exec, $browser --profile-directory="Default"
 
 # Move focus with mainMod + arrow keys
 binde = $mainMod, H, movefocus, l
@@ -190,8 +200,8 @@ bind = $mainMod SHIFT, 0, movetoworkspace, 10
 bind = $mainMod, S, togglespecialworkspace, magic
 bind = $mainMod SHIFT, S, movetoworkspace, special:magic
 
-bind = $mainMod, RETURN, togglespecialworkspace, everything
-bind = SUPER, C, togglespecialworkspace, cava
+# bind = SUPER, RETURN, togglespecialworkspace, everything
+bind = SUPER, RETURN, togglespecialworkspace, ssh
 
 # Scroll through existing workspaces with mainMod + scroll
 bind = $mainMod, mouse_down, workspace, e+1
@@ -207,33 +217,43 @@ bind = SUPER, Tab, workspace, previous
 # Laptop multimedia keys for volume and LCD brightness
 bindel = , XF86AudioRaiseVolume, exec, ~/.config/hypr/scripts/volume --inc 
 bindel = , XF86AudioLowerVolume, exec, ~/.config/hypr/scripts/volume --dec 
+# bindel = , XF86AudioRaiseVolume, exec, adb shell input keyevent 24
+# bindel = , XF86AudioLowerVolume, exec, adb shell input keyevent 25
 bindel = , XF86AudioMicMute, exec, ~/.config/hypr/scripts/volume --toggle-mic 
 bindel = , XF86AudioMute, exec, ~/.config/hypr/scripts/volume --toggle
 bindel = , XF86MonBrightnessUp, exec, ~/.config/hypr/scripts/backlight --inc 
 bindel = , XF86MonBrightnessDown, exec, ~/.config/hypr/scripts/backlight --dec
+# bindel = , XF86MonBrightnessUp, exec, adb shell input keyevent 221
+# bindel = , XF86MonBrightnessDown, exec, adb shell input keyevent 220
 
 
-windowrule = suppressevent maximize, class:.*
+# windowrule = suppressevent maximize, class:.*
 
-windowrule = workspace: 1, class:code
-windowrule = workspace: 1, class:cursor
-windowrule = workspace: 2, class:mpv
-windowrule = workspace: 3, class:obsidian
+# windowrule = workspace: 1, class:code
+# windowrule = workspace: 1, class:dev.zed.Zed
+# windowrule = workspace: 1, class:jetbrains-idea-ce
+# windowrule = workspace: 1, class:jetbrains-webstorm
+# windowrule = workspace: 1, class:cursor
+# windowrule = workspace: 1, class:Emulator
+# windowrule = workspace: 2, class:mpv
 
-windowrule = float, class:(xfce-polkit)
-windowrule = float, class:(nwg-look)
-windowrule = float, class:(timeshift-gtk)
-windowrule = float, class:(cheese)
-windowrule = float, class:(org.gnome.DiskUtility)
-windowrule = float, class:(org.pwmt.zathura)
-windowrule = float, class:(org.raspberrypi.rpi-imager)
-
-windowrule = fullscreen, class:(mpv)
-
-windowrule = float, class:(eog)
-windowrule = size 1000 800, class:(eog)
-
-windowrule = float, class:(blueman-manager)
+# windowrule = float, class:(xfce-polkit)
+# windowrule = float, class:(nwg-look)
+# windowrule = float, class:(timeshift-gtk)
+# windowrule = float, class:(cheese)
+# windowrule = float, class:(org.gnome.DiskUtility)
+# windowrule = float, class:(org.pwmt.zathura)
+# windowrule = float, class:(org.raspberrypi.rpi-imager)
+# windowrule = float, class:(com.network.manager)
+# windowrule = float, class:(com.saivert.pwvucontrol)
+# windowrule = float, class:(Emulator)
+#
+# # windowrule = fullscreen, class:(mpv)
+#
+# windowrule = float, class:(org.nomacs.ImageLounge)
+# windowrule = size 1000 800, class:(org.nomacs.ImageLounge)
+#
+# windowrule = float, class:(blueman-manager)
 
 bind = CTRL $mainMod SHIFT, K, movecurrentworkspacetomonitor, u
 bind = CTRL $mainMod SHIFT, J, movecurrentworkspacetomonitor, d

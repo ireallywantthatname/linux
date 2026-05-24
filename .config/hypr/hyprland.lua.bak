@@ -1,0 +1,341 @@
+-- Hyprland Lua Configuration
+-- Migrated from ~/.config/hypr/hyprland.conf
+-- Compatibility: Hyprland v0.55+
+
+------------------
+---- MONITORS ----
+------------------
+
+-- See https://wiki.hypr.land/Configuring/Basics/Monitors/
+hl.monitor({
+    output   = "eDP-1",
+    mode     = "2256x1504@60.00",
+    position = "0x0",
+    scale    = 1.566667
+})
+
+hl.monitor({
+    output   = "DP-1",
+    mode     = "1920x1080@60.00000",
+    position = "0x-1080",
+    scale    = 1.25
+})
+
+-- hl.monitor({
+--     output   = "DP-2",
+--     mode     = "1920x1080@60.00000",
+--     position = "0x-1080",
+--     scale    = 1.25
+-- })
+
+-- hl.monitor({
+--     output   = "HDMI-A-1",
+--     mode     = "1920x1080@60.00000",
+--     position = "0x0",
+--     scale    = 1.25
+-- })
+
+
+------------------
+---- XWAYLAND ----
+------------------
+
+hl.config({
+    xwayland = {
+        force_zero_scaling = true
+    }
+})
+
+
+---------------------
+---- MY PROGRAMS ----
+---------------------
+
+local terminal    = "kitty"
+local fileManager = "thunar"
+local menu        = "hyprlauncher"
+local browser     = "helium-browser"
+
+
+-------------------
+---- AUTOSTART ----
+-------------------
+
+-- See https://wiki.hypr.land/Configuring/Basics/Autostart/
+hl.on("hyprland.start", function ()
+    hl.exec_cmd("fnott")
+    hl.exec_cmd("nm-applet")
+    -- hl.exec_cmd("swaybg -i ~/Downloads/wallpaper.jpeg -m fit")
+    -- hl.exec_cmd("swaybg -i ~/Downloads/IMG_3175.jpg -m fit")
+    hl.exec_cmd("hyprpaper")
+    hl.exec_cmd("/home/irwtn/.local/bin/ironbar")
+    hl.exec_cmd("wl-paste --type text --watch cliphist store")
+    hl.exec_cmd("wl-paste --type image --watch cliphist store")
+    
+    hl.exec_cmd("bash ~/.config/hypr/scripts/startup")
+    hl.exec_cmd("thunar --daemon")
+    -- hl.exec_cmd("extramaus")
+    
+    hl.exec_cmd("bash ~/.config/hypr/scripts/battery-low")
+    hl.exec_cmd("bash ~/.config/hypr/scripts/battery-status")
+    hl.exec_cmd("hyprlauncher -d")
+    hl.exec_cmd("hyprsunset")
+    
+    -- hl.exec_cmd("hypridle")
+end)
+
+
+-------------------------------
+---- ENVIRONMENT VARIABLES ----
+-------------------------------
+
+-- See https://wiki.hypr.land/Configuring/Advanced-and-Cool/Environment-variables/
+hl.env("XCURSOR_SIZE", "24")
+hl.env("HYPRCURSOR_SIZE", "24")
+hl.env("QT_QPA_PLATFORMTHEME", "hyprqt6engine")
+
+
+-----------------------
+---- LOOK AND FEEL ----
+-----------------------
+
+-- Refer to https://wiki.hypr.land/Configuring/Basics/Variables/
+hl.config({
+    general = {
+        gaps_in             = 4,
+        gaps_out            = 8,
+        border_size         = 0,
+        col = {
+            inactive_border = "0xff000000",
+            active_border   = "0xffc0c0c0",
+        },
+        resize_on_border    = false,
+        allow_tearing       = true,
+        layout              = "dwindle"
+    },
+
+    decoration = {
+        rounding     = 0,
+        dim_inactive = true,
+        dim_strength = 0.2,
+        dim_special  = 0,
+        blur = {
+            enabled = false
+        }
+    },
+
+    animations = {
+        enabled = false,
+        -- first_launch_animation = false
+    },
+
+    dwindle = {
+        -- pseudotile = true,
+        preserve_split = true
+    },
+
+    master = {
+        new_status = "master"
+    },
+
+    misc = {
+        disable_hyprland_logo   = true,
+        font_family             = "FiraCode Nerd Font",
+        splash_font_family      = "FiraCode Nerd Font",
+        force_default_wallpaper = 1,
+        vrr                     = 1
+    },
+
+    input = {
+        kb_layout      = "us",
+        follow_mouse   = 1,
+        sensitivity    = 0.3,
+        focus_on_close = 1,
+        touchpad = {
+            natural_scroll          = true,
+            middle_button_emulation = true
+        },
+        touchdevice = {
+            enabled = true
+        }
+    },
+
+    gestures = {
+        workspace_swipe_touch = true
+    },
+
+    binds = {
+        allow_workspace_cycles = true,
+        workspace_center_on    = 1
+    },
+
+    cursor = {
+        zoom_factor = 1
+    }
+})
+
+
+----------------------------
+---- PER-DEVICE SETTINGS ---
+----------------------------
+
+hl.device({
+    name        = "epic-mouse-v1",
+    sensitivity = -0.5
+})
+
+
+------------------
+---- GESTURES ----
+------------------
+
+hl.gesture({ fingers = 3, direction = "horizontal", action = "workspace" })
+hl.gesture({ fingers = 3, direction = "up", action = "fullscreen" })
+hl.gesture({ fingers = 3, direction = "down", action = "close" })
+
+
+--------------------
+---- ANIMATIONS ----
+--------------------
+
+hl.curve("overshot", { type = "bezier", points = { {0.13, 0.99}, {0.29, 1.1} } })
+
+-- hl.animation({ leaf = "windows", enabled = true, speed = 4, curve = "overshot", style = "slide" })
+-- hl.animation({ leaf = "windowsOut", enabled = true, speed = 5, curve = "default", style = "popin 80%" })
+-- hl.animation({ leaf = "border", enabled = true, speed = 5, curve = "default" })
+-- hl.animation({ leaf = "fade", enabled = true, speed = 8, curve = "default" })
+-- hl.animation({ leaf = "workspaces", enabled = true, speed = 6, curve = "overshot", style = "slide" })
+
+
+---------------------
+---- KEY BINDINGS ---
+---------------------
+
+local mainMod = "ALT"
+
+-- Basic session management and applications
+hl.bind(mainMod .. " + Q", hl.dsp.window.close(), { locked = true, repeating = true })
+hl.bind("SUPER + SHIFT + Q", hl.dsp.exec_cmd("hyprshutdown"))
+hl.bind(mainMod .. " + P", hl.dsp.exec_cmd(menu))
+hl.bind(mainMod .. " + R", hl.dsp.window.pseudo())
+hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
+-- hl.bind(mainMod .. " + T", hl.dsp.window.split({ action = "toggle" }))
+hl.bind(mainMod .. " + M", hl.dsp.window.fullscreen())
+hl.bind("SUPER + P", hl.dsp.window.pin())
+
+-- System power/lock binds
+hl.bind("SUPER + SHIFT + L", hl.dsp.exec_cmd("hyprlock"))
+hl.bind("SUPER + SHIFT + R", hl.dsp.exec_cmd("hyprshutdown -t 'Rebooting...' --post-cmd 'systemctl reboot'"))
+hl.bind("SUPER + SHIFT + S", hl.dsp.exec_cmd("systemctl suspend"))
+hl.bind("SUPER + SHIFT + P", hl.dsp.exec_cmd("hyprshutdown -t 'Shutting down...' --post-cmd '~/.config/hypr/scripts/shutdown'"))
+
+-- Screenshot & utility binds
+hl.bind("Print", hl.dsp.exec_cmd("~/.config/hypr/scripts/screenshots.sh"))
+-- hl.bind("Print", hl.dsp.exec_cmd("adb shell input keyevent 25 & adb shell input keyevent 26"))
+hl.bind("SHIFT + Print", hl.dsp.exec_cmd("~/.config/hypr/scripts/ocr.sh"))
+hl.bind("SUPER + V", hl.dsp.exec_cmd("~/.local/bin/voice-typer"))
+
+-- Media control binds
+hl.bind("Pause", hl.dsp.exec_cmd("playerctl --player=spotify play-pause"))
+hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("playerctl --player=spotify previous"))
+hl.bind("XF86AudioNext", hl.dsp.exec_cmd("playerctl --player=spotify next"))
+
+-- Screen/touch control binds
+hl.bind("XF86PowerOff", hl.dsp.exec_cmd("hyprctl dispatch dpms toggle"))
+-- hl.bind("XF86PowerOff", hl.dsp.exec_cmd("adb shell input keyevent 26"))
+hl.bind("SUPER + XF86PowerOff", hl.dsp.exec_cmd("hyprctl keyword input:touchdevice:enabled true"))
+hl.bind("SUPER + SHIFT + XF86PowerOff", hl.dsp.exec_cmd("hyprctl keyword input:touchdevice:enabled false"))
+hl.bind(mainMod .. " + XF86PowerOff", hl.dsp.exec_cmd("adb shell input keyevent 26"))
+-- hl.bind("XF86PowerOff", hl.dsp.exec_cmd("hyprctl keyword monitor eDP-1,preferred,auto,1.333333,transform,2"))
+-- hl.bind("SHIFT + XF86PowerOff", hl.dsp.exec_cmd("hyprctl keyword monitor eDP-1,preferred,auto,1.333333,transform,0"))
+
+-- Layout, Steam, Whatsapp, and browser binds
+hl.bind("SUPER + G", hl.dsp.layout("swapnext"), { locked = true, repeating = true })
+hl.bind("SUPER + SHIFT + G", hl.dsp.exec_cmd("~/.config/hypr/scripts/steam"))
+hl.bind("SUPER + M", hl.dsp.exec_cmd("[workspace 5] " .. browser .. ' --profile-directory="Default" --app=https://web.whatsapp.com'))
+
+hl.bind(mainMod .. " + O", hl.dsp.exec_cmd("cliphist list | fuzzel --dmenu  | cliphist decode | wl-copy"))
+hl.bind("SUPER + O", hl.dsp.exec_cmd('echo -e "spreadsheets\\npresentation\\nforms\\ndocument" | fuzzel --dmenu | xargs -I{} ' .. browser .. ' --profile-directory="Default" --app=https://docs.google.com/{}/ &> /dev/null &'))
+hl.bind("SUPER + L", hl.dsp.exec_cmd("~/.config/hypr/scripts/work --list"))
+hl.bind(mainMod .. " + RETURN", hl.dsp.exec_cmd(terminal))
+hl.bind("SUPER + SHIFT + W", hl.dsp.exec_cmd("brave"))
+hl.bind("SUPER + W", hl.dsp.exec_cmd(browser .. ' --profile-directory="Default"'))
+
+-- Move focus with mainMod + arrow keys (hjkl)
+hl.bind(mainMod .. " + H", hl.dsp.focus({ direction = "left" }), { repeating = true })
+hl.bind(mainMod .. " + L", hl.dsp.focus({ direction = "right" }), { repeating = true })
+hl.bind(mainMod .. " + K", hl.dsp.focus({ direction = "up" }), { repeating = true })
+hl.bind(mainMod .. " + J", hl.dsp.focus({ direction = "down" }), { repeating = true })
+
+-- Resizing active window
+hl.bind(mainMod .. " + SHIFT + L", hl.dsp.window.resize({ x = 40, y = 0, relative = true }), { repeating = true })
+hl.bind(mainMod .. " + SHIFT + H", hl.dsp.window.resize({ x = -40, y = 0, relative = true }), { repeating = true })
+hl.bind(mainMod .. " + SHIFT + K", hl.dsp.window.resize({ x = 0, y = -40, relative = true }), { repeating = true })
+hl.bind(mainMod .. " + SHIFT + J", hl.dsp.window.resize({ x = 0, y = 40, relative = true }), { repeating = true })
+
+-- Dynamic loop for switching workspaces and moving windows (1-10)
+for i = 1, 10 do
+    local key = i % 10
+    hl.bind(mainMod .. " + " .. key, hl.dsp.focus({ workspace = i }))
+    hl.bind(mainMod .. " + SHIFT + " .. key, hl.dsp.window.move({ workspace = i }))
+end
+
+-- Special workspace keybindings
+hl.bind(mainMod .. " + S", hl.dsp.workspace.toggle_special("magic"))
+hl.bind(mainMod .. " + SHIFT + S", hl.dsp.window.move({ workspace = "special:magic" }))
+hl.bind("SUPER + RETURN", hl.dsp.workspace.toggle_special("ssh"))
+
+-- Mouse scrolling through workspaces
+hl.bind(mainMod .. " + mouse_down", hl.dsp.focus({ workspace = "e+1" }))
+hl.bind(mainMod .. " + mouse_up", hl.dsp.focus({ workspace = "e-1" }))
+
+-- Interactive mouse window moving and resizing
+-- hl.bind(mainMod .. " + mouse:274", hl.dsp.window.move(), { mouse = true })
+hl.bind(mainMod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
+
+-- Cycle between current and previous workspace
+hl.bind("SUPER + Tab", hl.dsp.focus({ workspace = "previous" }))
+
+-- Laptop volume and LCD brightness control
+hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("~/.config/hypr/scripts/volume --inc"), { locked = true, repeating = true })
+hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("~/.config/hypr/scripts/volume --dec"), { locked = true, repeating = true })
+hl.bind("XF86AudioMicMute", hl.dsp.exec_cmd("~/.config/hypr/scripts/volume --toggle-mic"), { locked = true, repeating = true })
+hl.bind("XF86AudioMute", hl.dsp.exec_cmd("~/.config/hypr/scripts/volume --toggle"), { locked = true, repeating = true })
+hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd("~/.config/hypr/scripts/backlight --inc"), { locked = true, repeating = true })
+hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("~/.config/hypr/scripts/backlight --dec"), { locked = true, repeating = true })
+
+-- Monitor relative workspace movements
+hl.bind("CTRL + " .. mainMod .. " + SHIFT + K", hl.dsp.workspace.move({ monitor = "u" }))
+hl.bind("CTRL + " .. mainMod .. " + SHIFT + J", hl.dsp.workspace.move({ monitor = "d" }))
+
+
+--------------------
+--- WINDOW RULES ---
+--------------------
+
+-- Legacy commented-out window rules translated to the new Lua syntax:
+-- -- hl.window_rule({ match = { class = "code" }, workspace = 1 })
+-- -- hl.window_rule({ match = { class = "dev.zed.Zed" }, workspace = 1 })
+-- -- hl.window_rule({ match = { class = "jetbrains-idea-ce" }, workspace = 1 })
+-- -- hl.window_rule({ match = { class = "jetbrains-webstorm" }, workspace = 1 })
+-- -- hl.window_rule({ match = { class = "cursor" }, workspace = 1 })
+-- -- hl.window_rule({ match = { class = "Emulator" }, workspace = 1 })
+-- -- hl.window_rule({ match = { class = "mpv" }, workspace = 2 })
+-- 
+-- -- hl.window_rule({ match = { class = "xfce-polkit" }, float = true })
+-- -- hl.window_rule({ match = { class = "nwg-look" }, float = true })
+-- -- hl.window_rule({ match = { class = "timeshift-gtk" }, float = true })
+-- -- hl.window_rule({ match = { class = "cheese" }, float = true })
+-- -- hl.window_rule({ match = { class = "org.gnome.DiskUtility" }, float = true })
+-- -- hl.window_rule({ match = { class = "org.pwmt.zathura" }, float = true })
+-- -- hl.window_rule({ match = { class = "org.raspberrypi.rpi-imager" }, float = true })
+-- -- hl.window_rule({ match = { class = "com.network.manager" }, float = true })
+-- -- hl.window_rule({ match = { class = "com.saivert.pwvucontrol" }, float = true })
+-- -- hl.window_rule({ match = { class = "Emulator" }, float = true })
+-- 
+-- -- hl.window_rule({ match = { class = "mpv" }, fullscreen = true })
+-- 
+-- -- hl.window_rule({ match = { class = "org.nomacs.ImageLounge" }, float = true })
+-- -- hl.window_rule({ match = { class = "org.nomacs.ImageLounge" }, size = { 1000, 800 } })
+-- 
+-- -- hl.window_rule({ match = { class = "blueman-manager" }, float = true })

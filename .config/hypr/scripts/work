@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+urls=(
+  "dashboard.tawk.to/#/dashboard"
+  "sw-admin.luckybunny.fun/admin-sweep/users/players"
+  "portal.jumio.ai/login"
+  "web.whatsapp.com"
+  "notion.so"
+  "duck.ai"
+)
+
+selected=$(printf '%s\n' "${urls[@]}" | fuzzel --dmenu)
+[[ -n $selected ]] && helium-browser --profile-directory="Profile 5" --app="https://$selected/" &> /dev/null &
