@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+
+set -u
+
+notify() {
+    if command -v notify-send >/dev/null 2>&1; then
+        notify-send -h string:x-canonical-private-synchronous:ai-chat-notify \
+            -u low "$1"
+    fi
+}
+
+check_dependencies() {
+    local dependency
+
+    for dependency in curl jq fuzzel wl-copy notify-send; do
+        if ! command -v "$dependency" >/dev/null 2>&1; then
+            notify "$dependency is not installed"
+            return 1
+        fi
+    done
+}
+
+main() {
+    local model="${GROQ_MODEL:-llama-3.1-8b-instant}"
+    local system_message="Answer clearly and concisely. Return only the answer."
+    local prompt payload response http_status body answer
+    local curl_status
+
+    check_dependencies || return 1
+
+    if [[ -z "${GROQ_API_KEY:-}" ]]; then
+        notify "GROQ_API_KEY is not set"
+        return 1
+    fi
+
+    prompt=$(fuzzel --dmenu </dev/null)
+    [[ -z "$prompt" ]] && return
+
+    payload=$(jq -n \
+        --arg model "$model" \
+        --arg system_message "$system_message" \
+        --arg prompt "$prompt" \
+        '{
+            model: $model,
+            messages: [
+                {role: "system", content: $system_message},
+                {role: "user", content: $prompt}
+            ]
+        }')
+
+    response=$(curl -sS \
+        -o - \
+        -w $'\n%{http_code}' \
+        -H "Authorization: Bearer ${GROQ_API_KEY}" \
+        -H "Content-Type: application/json" \
+        -d "$payload" \
+        https://api.groq.com/openai/v1/chat/completions \
+        2>/dev/null)
+    curl_status=$?
+
+    if ((curl_status != 0)); then
+        notify "Groq request failed"
+        return 1
+    fi
+
+    http_status="${response##*$'\n'}"
+    body="${response%$'\n'*}"
+
+    if [[ "$http_status" != 2* ]]; then
+        notify "Groq API error $http_status"
+        return 1
+    fi
+
+    answer=$(jq -r '.choices[0].message.content // empty' <<<"$body" 2>/dev/null)
+    if [[ -z "$answer" ]]; then
+        notify "Malformed or empty Groq response"
+        return 1
+    fi
+
+    if ! printf "%s" "$answer" | wl-copy; then
+        notify "Failed to copy AI response"
+        return 1
+    fi
+
+    notify "AI response copied"
+}
+
+main

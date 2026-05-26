@@ -51,7 +51,9 @@ hl.bind(mainMod .. " + XF86PowerOff", hl.dsp.exec_cmd("adb shell input keyevent 
 -- Layout, Steam, Whatsapp, Bluetooth, and browser binds
 hl.bind("SUPER + G", hl.dsp.layout("swapnext"), { locked = true, repeating = true })
 hl.bind("SUPER + SHIFT + G", hl.dsp.exec_cmd("~/.config/hypr/scripts/steam"))
+hl.bind(mainMod .. " + A", hl.dsp.exec_cmd("~/.config/hypr/scripts/ai-chat"))
 hl.bind(mainMod .. " + B", hl.dsp.exec_cmd("~/.config/hypr/scripts/bluetooth"))
+hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("~/.config/hypr/scripts/wifi"))
 hl.bind("SUPER + M", hl.dsp.exec_cmd("[workspace 5] " .. browser .. ' --profile-directory="Default" --app=https://web.whatsapp.com'))
 
 hl.bind(mainMod .. " + O", hl.dsp.exec_cmd("cliphist list | fuzzel --dmenu  | cliphist decode | wl-copy"))

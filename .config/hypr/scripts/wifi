@@ -1,0 +1,137 @@
+#!/usr/bin/env bash
+
+set -u
+
+notify() {
+    if command -v notify-send >/dev/null 2>&1; then
+        notify-send -h string:x-canonical-private-synchronous:wifi-notify \
+            -u low -i network-wireless "$1"
+    fi
+}
+
+split_nmcli_line() {
+    local line="$1"
+    local char field=""
+    local escaped=0
+    local i
+
+    NMCLI_FIELDS=()
+    for ((i = 0; i < ${#line}; i++)); do
+        char="${line:i:1}"
+        if ((escaped)); then
+            field+="$char"
+            escaped=0
+        elif [[ "$char" == '\' ]]; then
+            escaped=1
+        elif [[ "$char" == ":" ]]; then
+            NMCLI_FIELDS+=("$field")
+            field=""
+        else
+            field+="$char"
+        fi
+    done
+
+    if ((escaped)); then
+        field+="\\"
+    fi
+
+    NMCLI_FIELDS+=("$field")
+}
+
+connect_profile() {
+    local uuid="$1"
+    local name="$2"
+    local output
+
+    if output=$(nmcli connection up uuid "$uuid" 2>&1); then
+        notify "Connected to $name"
+    else
+        notify "Failed to connect to $name"
+        return 1
+    fi
+}
+
+disconnect_device() {
+    local device="$1"
+    local name="$2"
+    local output
+
+    if [[ -z "$device" ]]; then
+        notify "Failed to disconnect from $name"
+        return 1
+    fi
+
+    if output=$(nmcli device disconnect "$device" 2>&1); then
+        notify "Disconnected from $name"
+    else
+        notify "Failed to disconnect from $name"
+        return 1
+    fi
+}
+
+main() {
+    local menu_items=""
+    local line name uuid type device status row selection selected_status
+    declare -A profile_uuid=()
+    declare -A profile_device=()
+    declare -A profile_name=()
+    declare -a NMCLI_FIELDS=()
+
+    if ! command -v nmcli >/dev/null 2>&1; then
+        notify "nmcli is not installed"
+        return 1
+    fi
+
+    if ! command -v fuzzel >/dev/null 2>&1; then
+        notify "fuzzel is not installed"
+        return 1
+    fi
+
+    while IFS= read -r line; do
+        [[ -z "$line" ]] && continue
+
+        split_nmcli_line "$line"
+        name="${NMCLI_FIELDS[0]:-}"
+        uuid="${NMCLI_FIELDS[1]:-}"
+        type="${NMCLI_FIELDS[2]:-}"
+        device="${NMCLI_FIELDS[3]:-}"
+
+        [[ "$type" == "802-11-wireless" ]] || continue
+        [[ -z "$name" || -z "$uuid" ]] && continue
+
+        if [[ -n "$device" ]]; then
+            status="connected"
+        else
+            status="disconnected"
+        fi
+
+        row="$status $name"
+        menu_items+="$row"$'\n'
+        profile_uuid["$row"]="$uuid"
+        profile_device["$row"]="$device"
+        profile_name["$row"]="$name"
+    done < <(nmcli -t -f NAME,UUID,TYPE,DEVICE connection show 2>/dev/null)
+
+    if [[ -z "$menu_items" ]]; then
+        notify "No saved Wi-Fi profiles"
+        return
+    fi
+
+    selection=$(printf "%s" "$menu_items" | fuzzel --dmenu)
+    [[ -z "$selection" ]] && return
+
+    uuid="${profile_uuid[$selection]:-}"
+    [[ -z "$uuid" ]] && return 1
+
+    selected_status="${selection%% *}"
+    name="${profile_name[$selection]:-}"
+    device="${profile_device[$selection]:-}"
+
+    if [[ "$selected_status" == "connected" ]]; then
+        disconnect_device "$device" "$name"
+    else
+        connect_profile "$uuid" "$name"
+    fi
+}
+
+main
