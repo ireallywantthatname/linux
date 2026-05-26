@@ -9,6 +9,18 @@ type = "focused"
 icon_size = 16
 
 [[end]]
+type = "volume"
+
+[[end]]
+type = "script"
+cmd = "/home/irwtn/.config/ironbar/scripts/brightness.sh"
+interval = 1000
+mode = "poll"
+class = "brightness"
+on_scroll_up = "brightnessctl set 5%+"
+on_scroll_down = "brightnessctl set 5%-"
+
+[[end]]
 type = "battery"
 format = "{percentage}%"
 
