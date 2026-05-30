@@ -48,7 +48,8 @@ hl.config({
             inactive_border = "0x00000000", -- Fully invisible to prevent visual clutter
             active_border   = theme.lavender, -- Premium Catppuccin accent
         },
-        resize_on_border    = false,
+        resize_on_border    = true,
+        extend_border_grab_area = 12,
         allow_tearing       = true,
         layout              = "dwindle"
     },
